@@ -1,0 +1,17 @@
+{
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "deploy": "wrangler deploy --env prod src/index.ts",
+    "dev": "wrangler dev src/index.ts --local --test-scheduled",
+    "devprod": "wrangler dev --env prod src/index.ts --local --test-scheduled"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240314.0",
+    "wrangler": "^3.34.2"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^16.0.3"
+  }
+}
