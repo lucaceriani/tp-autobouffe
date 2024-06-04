@@ -90,11 +90,11 @@ async function getAlterStartFood() {
 
   const todaysDish = $('.woocommerce-loop-product__title')
   if (!todaysDish) return ERROR_MSG
-  
+
   const asf = $(todaysDish)
-            .toArray()
-            .map(dish => '- ' + $(dish).text())
-            .join('\n')
+    .toArray()
+    .map(dish => '- ' + $(dish).text())
+    .join('\n')
 
   return asf || "Oupsi, c'est pas lundi..."
 }
