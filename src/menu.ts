@@ -1,14 +1,14 @@
 import { load as CheerioLoad } from 'cheerio'
 
 const UA = 'Mozilla/5.0'
-const ERROR_MSG = "J'arrive pas à récupérer le menu, désolé 😢. J'essaierai mieux demain ..."
+const ERROR_MSG = "J'arrive pas à récupérer le menu, désolé 🤷 je ferai mieux demain 💤"
 
 export const getMenu = async () => {
-  const [quai14, food_trucks, arsenic, school_holiday] = (
-    await Promise.allSettled([getQuai14(), getFoodTrucks(), getArsenic(), getSchoolHoliday()])
+  const [quai14, food_trucks, arsenic, alter_start_food, school_holiday] = (
+    await Promise.allSettled([getQuai14(), getFoodTrucks(), getArsenic(), getAlterStartFood(), getSchoolHoliday()])
   ).map(p => (p.status === 'fulfilled' ? p.value : ERROR_MSG))
 
-  return { quai14, food_trucks, arsenic, school_holiday }
+  return { quai14, food_trucks, arsenic, alter_start_food, school_holiday }
 }
 
 async function getQuai14() {
@@ -80,6 +80,23 @@ async function getArsenic() {
         )
       }) || ERROR_MSG
   ).replace(/^.+?:\s*/i, '') // remove everything before the first ':', including the ':'
+}
+
+async function getAlterStartFood() {
+  const html = await getHtml('https://alterstartfood.ch/lunch-box-geneve/')
+  if (!html) return ERROR_MSG
+
+  const $ = CheerioLoad(html)
+
+  const todaysDish = $('.woocommerce-loop-product__title')
+  if (!todaysDish) return ERROR_MSG
+  
+  const asf = $(todaysDish)
+            .toArray()
+            .map(dish => '- ' + $(dish).text())
+            .join('\n')
+
+  return asf || "Oupsi, c'est pas lundi..."
 }
 
 async function getSchoolHoliday() {
