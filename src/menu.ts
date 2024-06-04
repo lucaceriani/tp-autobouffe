@@ -83,7 +83,7 @@ async function getArsenic() {
 }
 
 async function getAlterStartFood() {
-  const html = await getHtml('https://alterstartfood.ch/lunch-box-geneve/')
+  const html = await getHtml('https://alterstartfood.ch/lunch-box-lausanne/')
   if (!html) return ERROR_MSG
 
   const $ = CheerioLoad(html)
