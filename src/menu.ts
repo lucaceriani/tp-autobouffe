@@ -74,7 +74,7 @@ async function getArsenic() {
         const s = S.toLowerCase()
         return (
           // 5.4 or 5.04 or 05.04
-          new RegExp(String.raw`\b${day}\.(0?${month})\b`).test(s) ||
+          new RegExp(String.raw`\b0?${day}\.0?${month}\b`).test(s) ||
           // ven 5 avr
           (s.includes(weekDayFr) && s.includes(monthFr))
         )
