@@ -93,10 +93,14 @@ async function getAlterStartFood() {
 
   const asf = $(todaysDish)
     .toArray()
-    .map(dish => '- ' + $(dish).text())
-    .join('\n')
+    .filter(dish => $(dish).text().trim() !== '')
+    .map(dish => '- ' + $(dish).text().trim())
 
-  return asf || "Oupsi, c'est pas lundi..."
+  if (asf.length !== 0) {
+    asf.push('\nCommandez ici avec le code "tipee10" ➡️ https://alterstartfood.ch/lunch-box-lausanne/')
+  }
+
+  return asf.join('\n') || "Oupsi, c'est pas lundi..."
 }
 
 async function getSchoolHoliday() {
