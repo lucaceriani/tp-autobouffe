@@ -1,6 +1,6 @@
 import { load as CheerioLoad } from 'cheerio'
 
-const UA = 'Mozilla/5.0'
+const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36'
 const ERROR_MSG = "J'arrive pas à récupérer le menu, désolé 🤷 je ferai mieux demain 💤"
 
 export const getMenu = async () => {
