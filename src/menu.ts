@@ -83,6 +83,12 @@ async function getArsenic() {
 }
 
 async function getAlterStartFood() {
+  const isMonday = new Date().getDay() === 1
+  const isWednesday = new Date().getDay() === 3
+
+  if (isWednesday) return "C'est mercredi, les commandes arrivent à ~12h00 ! 🚚"
+  if (!isMonday) return "Oupsi, c'est pas lundi..."
+
   const html = await getHtml('https://alterstartfood.ch/lunch-box-lausanne/')
   if (!html) return ERROR_MSG
 
@@ -100,7 +106,7 @@ async function getAlterStartFood() {
     asf.push('\nCommandez ici avec le code "tipee10" ➡️ https://alterstartfood.ch/lunch-box-lausanne/')
   }
 
-  return asf.join('\n') || "Oupsi, c'est pas lundi..."
+  return asf.join('\n') || ERROR_MSG
 }
 
 async function getSchoolHoliday() {
