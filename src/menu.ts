@@ -42,9 +42,10 @@ async function getFoodTrucks() {
     .toArray()
     .reduce((acc, el) => {
       if (el.tagName.toUpperCase() == 'H2') {
-        acc.push([])
+        acc.push([]) // new day of the week
       } else {
-        const [name, menu] = $(el).text().trim().replace(/\n+/g, '\n').split('\n').slice(0, 2)
+        const name = $(el).find('h4').first().text().trim()
+        const menu = $(el).find('p').first().text().trim()
         acc[acc.length - 1].push(`- ${name.trim()} (${menu.trim().toLowerCase().replace(' (', ', ').replace(')', '')})`)
       }
       return acc
