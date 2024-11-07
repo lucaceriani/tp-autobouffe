@@ -67,7 +67,12 @@ async function getArsenic() {
   const $ = CheerioLoad(html)
 
   return (
-    ($(`.page-text p:contains("MIDI")`).slice(0, 2).html() || '')
+    (
+      $(`.page-text p:contains("MIDI"), .page-text p:contains("MIDI") ~ p`)
+        .toArray()
+        .map(p => $(p).html())
+        .join('') || ''
+    )
       .replace('\n', '') // not really necessary
       .replace(/\s*<\s*br\s*\/?>\s*/gi, '\n')
       .split('\n')
