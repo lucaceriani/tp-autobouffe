@@ -56,7 +56,7 @@ async function getQuai14() {
 
 async function getFoodTrucks() {
   const html = await getHtml(
-    'https://www.lausanne.ch/vie-pratique/economie-et-commerces/marches-et-commerce-itinerant/food-trucks/food-trucks-sevelin.html'
+    'https://web.archive.org/web/20990000000000/https://www.lausanne.ch/vie-pratique/economie-et-commerces/marches-et-commerce-itinerant/food-trucks/food-trucks-sevelin.html'
   )
   if (!html) return ERROR_MSG
 
