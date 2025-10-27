@@ -29,11 +29,11 @@ const UA = [
 const ERROR_MSG = "J'arrive pas à récupérer le menu, désolé 🤷 je ferai mieux demain 💤"
 
 export const getMenu = async () => {
-  const [quai14, food_trucks, arsenic, alter_start_food, school_holiday] = (
-    await Promise.allSettled([getQuai14(), getFoodTrucks(), getArsenic(), getAlterStartFood(), getSchoolHoliday()])
+  const [quai14, food_trucks, arsenic, school_holiday] = (
+    await Promise.allSettled([getQuai14(), getFoodTrucks(), getArsenic(), getSchoolHoliday()])
   ).map(p => (p.status === 'fulfilled' ? p.value : ERROR_MSG))
 
-  return { quai14, food_trucks, arsenic, alter_start_food, school_holiday }
+  return { quai14, food_trucks, arsenic, school_holiday }
 }
 
 async function getQuai14() {
@@ -50,13 +50,13 @@ async function getQuai14() {
     .find('p')
     .not('.provenance, :contains(CHF)')
     .toArray()
-    .map(dish => '- ' + $(dish).text())
+    .map(dish => '- ' + $(dish).text().trim())
     .join('\n')
 }
 
 async function getFoodTrucks() {
   const html = await getHtml(
-    'https://web.archive.org/web/20990000000000/https://www.lausanne.ch/vie-pratique/economie-et-commerces/marches-et-commerce-itinerant/food-trucks/food-trucks-sevelin.html'
+    'https://web.archive.org/web/https://www.lausanne.ch/vie-pratique/economie-et-commerces/marches-et-commerce-itinerant/food-trucks/food-trucks-sevelin.html'
   )
   if (!html) return ERROR_MSG
 
