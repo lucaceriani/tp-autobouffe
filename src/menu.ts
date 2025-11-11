@@ -85,6 +85,7 @@ async function getArsenic() {
   const day = new Date().getDate().toString()
   const month = (new Date().getMonth() + 1).toString()
   const weekDayFr = ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'][new Date().getDay()]
+  const weekDayFrLong = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'][new Date().getDay()]
   const monthFr = ['jan', 'fév', 'mar', 'avr', 'mai', 'juin', 'juil', 'aoû', 'sep', 'oct', 'nov', 'déc'][
     new Date().getMonth()
   ]
@@ -99,7 +100,7 @@ async function getArsenic() {
         .join('') || ''
     )
       .replace('\n', '') // not really necessary
-      .replace(/\s*<\s*br\s*\/?>\s*/gi, '\n')
+      .replace(/\s*<\s*br[^>]*\/?>\s*/gi, '\n')
       .split('\n')
       .find(S => {
         const s = S.toLowerCase()
@@ -107,37 +108,14 @@ async function getArsenic() {
           // 5.4 or 5.04 or 05.04
           new RegExp(String.raw`\b0?${day}\.0?${month}\b`).test(s) ||
           // ven 5 avr
-          (s.includes(weekDayFr) && s.includes(monthFr))
+          (s.includes(weekDayFr) && s.includes(monthFr)) ||
+          // vendredi
+          s.includes(weekDayFrLong)
         )
       }) || ERROR_MSG
-  ).replace(/^.+?:\s*/i, '') // remove everything before the first ':', including the ':'
-}
-
-async function getAlterStartFood() {
-  const isMonday = new Date().getDay() === 1
-  const isWednesday = new Date().getDay() === 3
-
-  if (isWednesday) return "C'est mercredi, les commandes arrivent à ~12h00 ! 🚚"
-  if (!isMonday) return "Oupsi, c'est pas lundi..."
-
-  const html = await getHtml('https://alterstartfood.ch/lunch-box-lausanne/')
-  if (!html) return ERROR_MSG
-
-  const $ = CheerioLoad(html)
-
-  const todaysDish = $('.woocommerce-loop-product__title')
-  if (!todaysDish) return ERROR_MSG
-
-  const asf = $(todaysDish)
-    .toArray()
-    .filter(dish => $(dish).text().trim() !== '')
-    .map(dish => '- ' + $(dish).text().trim())
-
-  if (asf.length !== 0) {
-    asf.push('\nCommandez ici avec le code "tipee10" ➡️ https://alterstartfood.ch/lunch-box-lausanne/')
-  }
-
-  return asf.join('\n') || ERROR_MSG
+  )
+    .replace(/<[^>]*>?/gm, '') // remove HTML tags
+    .replace(/^.+?:\s*/i, '') // remove everything before the first ':', including the ':'
 }
 
 async function getSchoolHoliday() {
