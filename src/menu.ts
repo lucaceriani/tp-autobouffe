@@ -38,21 +38,18 @@ export const getMenu = async () => {
 
 async function getTheLunchClub() {
   const html = await getHtml('https://thelunchclub.ch/a/loop_subscriptions/bundle/cdce97a61ed74f998f7c749a8393f399')
-  if (!html) return ERROR_MSG;
+  if (!html) return ERROR_MSG
 
-  const match = html.match(/<script id="__NEXT_DATA__" type="application\/json">(.+?)<\/script>/);
-  if (!match) return ERROR_MSG;
+  const $ = CheerioLoad(html)
 
-  const nextData = JSON.parse(match[1]);
+  const nextData = JSON.parse($('#__NEXT_DATA__').html() || '{}')
 
-  const products = nextData?.props?.pageProps?.bundle?.products;
-  if (!products || products.length === 0) return ERROR_MSG;
+  const products = nextData?.props?.pageProps?.bundle?.products as { productTitle: string }[] | undefined
+  if (!products || products.length === 0) return ERROR_MSG
 
-  const todaysDishes = products
-    .map(p => '- ' + p.productTitle)
-    .join('\n');
+  const todaysDishes = products.map(p => '- ' + p.productTitle).join('\n')
 
-  return todaysDishes;
+  return todaysDishes
 }
 
 async function getQuai14() {
