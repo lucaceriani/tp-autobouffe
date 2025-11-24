@@ -20,7 +20,6 @@ const UA = [
       'Firefox/106.0',
       'Edge/130.0.',
       'SamsungBrowser/16.0',
-      'Safari/537.36',
     ].map(b => b + '.' + Math.floor(Math.random() * 1000))
   ),
   'Safari/537.36',
@@ -29,16 +28,26 @@ const UA = [
 const ERROR_MSG = "J'arrive pas à récupérer le menu, désolé 🤷 je ferai mieux demain 💤"
 
 export const getMenu = async () => {
-  const [quai14, food_trucks, arsenic, theLunchClub, school_holiday] = (
+  const [quai14, food_trucks, arsenic, the_lunch_club, school_holiday] = (
     await Promise.allSettled([getQuai14(), getFoodTrucks(), getArsenic(), getTheLunchClub(), getSchoolHoliday()])
   ).map(p => (p.status === 'fulfilled' ? p.value : ERROR_MSG))
 
-  return { quai14, food_trucks, arsenic, theLunchClub, school_holiday }
+  return { quai14, food_trucks, arsenic, the_lunch_club, school_holiday }
 }
 
 async function getTheLunchClub() {
   const html = await getHtml('https://thelunchclub.ch/a/loop_subscriptions/bundle/cdce97a61ed74f998f7c749a8393f399')
   if (!html) return ERROR_MSG
+
+  const dayOfWeek = new Date().getDay() // 1=monday, 7=sunday
+
+  if (dayOfWeek === 1) {
+    return "Les commandes arrivent aujourd'hui 🎉"
+  }
+
+  if (dayOfWeek >= 5) {
+    return 'À la semaine prochaine ! 👋\n'
+  }
 
   const $ = CheerioLoad(html)
 
@@ -47,9 +56,13 @@ async function getTheLunchClub() {
   const products = nextData?.props?.pageProps?.bundle?.products as { productTitle: string }[] | undefined
   if (!products || products.length === 0) return ERROR_MSG
 
-  const todaysDishes = products.map(p => '- ' + p.productTitle).join('\n')
+  const todaysDishes = products.map(p => '- ' + p.productTitle)
 
-  return todaysDishes
+  if (dayOfWeek === 4) {
+    todaysDishes.unshift("⚠️ Dernier jour pour commander, aujourd'hui jusqu'à 21:00 ⚠️\n")
+  }
+
+  return todaysDishes.join('\n')
 }
 
 async function getQuai14() {
@@ -108,7 +121,7 @@ async function getArsenic() {
 
   const $ = CheerioLoad(html)
 
-  return (
+  const dish = (
     (
       $(`.page-text p:contains("MIDI"), .page-text p:contains("MIDI") ~ p`)
         .toArray()
@@ -132,6 +145,9 @@ async function getArsenic() {
   )
     .replace(/<[^>]*>?/gm, '') // remove HTML tags
     .replace(/^.+?:\s*/i, '') // remove everything before the first ':', including the ':'
+    .trim()
+
+  return '- ' + dish.charAt(0).toUpperCase() + dish.slice(1)
 }
 
 async function getSchoolHoliday() {
