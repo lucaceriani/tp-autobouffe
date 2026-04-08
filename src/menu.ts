@@ -122,14 +122,13 @@ async function getArsenic() {
   const $ = CheerioLoad(html)
 
   const dish = (
-    (
-      $(`.page-text p:contains("MIDI"), .page-text p:contains("MIDI") ~ p`)
-        .toArray()
-        .map(p => $(p).html())
-        .join('') || ''
-    )
-      .replace('\n', '') // not really necessary
-      .replace(/\s*<\s*br[^>]*\/?>\s*/gi, '\n')
+    $(`.page-text`)
+      .text()
+      // .toArray()
+      // .map(p => $(p).html())
+      // .join('') || ''
+      // .replace('\n', '') // not really necessary
+      // .replace(/\s*<\s*br[^>]*\/?>\s*/gi, '\n')
       .split('\n')
       .find(S => {
         const s = S.toLowerCase()
