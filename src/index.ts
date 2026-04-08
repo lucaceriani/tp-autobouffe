@@ -1,6 +1,6 @@
 import { getMenu } from './menu'
 import { Env } from './types'
-import tlcQrPng from './assets/tlc-qr.png'
+import tlcQrPng from './assets/tlc-twint.png'
 import tlcTwintHtml from './assets/tlc-twint.html'
 
 export default {
