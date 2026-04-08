@@ -8,6 +8,16 @@ crons = ["00 7-8 * * 2-6"] # at UTC 7:00-8:00 (Zurich UTC +1 (or UTC +2 summer) 
 # secrets
 # WEBHOOK_URL = "https://hooks.slack.com/triggers/..."
 
+[[rules]]
+type = "Data"
+globs = ["**/*.png"]
+fallthrough = false
+
+[[rules]]
+type = "Text"
+globs = ["**/*.html"]
+fallthrough = false
+
 [vars]
 WORKER_ENV = "dev"
 

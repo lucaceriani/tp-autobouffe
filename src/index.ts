@@ -1,13 +1,32 @@
 import { getMenu } from './menu'
 import { Env } from './types'
+import tlcQrPng from './assets/tlc-qr.png'
+import tlcTwintHtml from './assets/tlc-twint.html'
 
 export default {
   async fetch(request: Request, env: Env, ctx: EventContext<Env, string, any>) {
-    if (env.WORKER_ENV === 'dev' && new URL(request.url).pathname === '/') {
+    const url = new URL(request.url)
+
+    if (env.WORKER_ENV === 'dev' && url.pathname === '/') {
       return new Response(JSON.stringify(await getMenu()))
-    } else {
-      return new Response('', { status: 404 })
     }
+
+    if (url.pathname === '/tlc-twint') {
+      return new Response(tlcTwintHtml, {
+        headers: { 'Content-Type': 'text/html; charset=utf-8' },
+      })
+    }
+
+    if (url.pathname === '/assets/tlc-twint.png') {
+      return new Response(tlcQrPng, {
+        headers: {
+          'Content-Type': 'image/png',
+          'Cache-Control': 'public, max-age=86400',
+        },
+      })
+    }
+
+    return new Response('', { status: 404 })
   },
 
   async scheduled(event: ScheduledEvent, env: Env, ctx: EventContext<Env, string, any>) {
