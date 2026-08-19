@@ -1,4 +1,5 @@
 import { load as CheerioLoad } from 'cheerio'
+import { Env } from './types'
 
 const sample = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)]
 
@@ -27,9 +28,9 @@ const UA = [
 
 const ERROR_MSG = "J'arrive pas à récupérer le menu, désolé 🤷 je ferai mieux demain 💤"
 
-export const getMenu = async () => {
+export const getMenu = async (env: Env) => {
   const [quai14, food_trucks, arsenic, the_lunch_club, school_holiday] = (
-    await Promise.allSettled([getQuai14(), getFoodTrucks(), getArsenic(), getTheLunchClub(), getSchoolHoliday()])
+    await Promise.allSettled([getQuai14(), getFoodTrucks(), getArsenic(env), getTheLunchClub(), getSchoolHoliday()])
   ).map(p => (p.status === 'fulfilled' ? p.value : ERROR_MSG))
 
   return { quai14, food_trucks, arsenic, the_lunch_club, school_holiday }
@@ -107,44 +108,46 @@ async function getFoodTrucks() {
     .map(trucks => trucks.join('\n'))[dayOfWeek]
 }
 
-async function getArsenic() {
+async function getArsenic(env: Env) {
   const html = await getHtml('https://arsenic.ch/cafe-restaurant/')
   if (!html) return ERROR_MSG
 
-  const day = new Date().getDate().toString()
-  const month = (new Date().getMonth() + 1).toString()
-  const weekDayFr = ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'][new Date().getDay()]
-  const weekDayFrLong = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'][new Date().getDay()]
-  const monthFr = ['jan', 'fév', 'mar', 'avr', 'mai', 'juin', 'juil', 'aoû', 'sep', 'oct', 'nov', 'déc'][
+  const day = new Date().getDate().toString().padStart(2, '0')
+  const month = (new Date().getMonth() + 1).toString().padStart(2, '0')
+  const weekDayFr = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'][new Date().getDay()]
+  const monthFr = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'][
     new Date().getMonth()
   ]
 
   const $ = CheerioLoad(html)
+  const pageText = $('.page-text').text().trim()
+  if (!pageText) return ERROR_MSG
 
-  const dish = (
-    $(`.page-text`)
-      .text()
-      // .toArray()
-      // .map(p => $(p).html())
-      // .join('') || ''
-      // .replace('\n', '') // not really necessary
-      // .replace(/\s*<\s*br[^>]*\/?>\s*/gi, '\n')
-      .split('\n')
-      .find(S => {
-        const s = S.toLowerCase()
-        return (
-          // 5.4 or 5.04 or 05.04
-          new RegExp(String.raw`\b0?${day}\.0?${month}\b`).test(s) ||
-          // ven 5 avr
-          (s.includes(weekDayFr) && s.includes(monthFr)) ||
-          // vendredi
-          s.includes(weekDayFrLong)
-        )
-      }) || ERROR_MSG
-  )
-    .replace(/<[^>]*>?/gm, '') // remove HTML tags
-    .replace(/^.+?:\s*/i, '') // remove everything before the first ':', including the ':'
-    .trim()
+  const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct-fp8-fast', {
+    messages: [
+      {
+        role: 'system',
+        content: [
+          'You extract the dish of the day from the text of a restaurant web page written in French.',
+          'The page lists one dish per weekday. The entry format changes often, for example:',
+          '- "LUNDI 17.08 : Risotto au citron" (date with or without zero-padding: 17.8, 17.08, 5.4, 05.04)',
+          '- "lun 17 août : Risotto au citron" (weekday and month possibly abbreviated: lun, mar, mer, jeu, ven / aoû, sep, ...)',
+          '- "Lundi : Risotto au citron" (weekday name only, no date)',
+          'The entries may be glued together without spaces or line breaks: a dish description ends where the next weekday name begins.',
+          "Reply with ONLY the dish description for the requested day, copied verbatim from the page, in French, without the weekday name, the date, the colon, or any other text.",
+          'If you cannot find a dish for the requested day, reply exactly: NOT_FOUND',
+        ].join('\n'),
+      },
+      {
+        role: 'user',
+        content: `Requested day: ${weekDayFr} ${day}.${month} (${weekDayFr} ${Number(day)} ${monthFr})\n\nPage text:\n${pageText}`,
+      },
+    ],
+    temperature: 0,
+  })
+
+  const dish = typeof result.response === 'string' ? result.response.trim() : ''
+  if (!dish || dish.includes('NOT_FOUND')) return ERROR_MSG
 
   return '- ' + dish.charAt(0).toUpperCase() + dish.slice(1)
 }

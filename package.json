@@ -2,13 +2,15 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "deploy": "wrangler deploy --env prod src/index.ts",
-    "dev": "wrangler dev src/index.ts --local --test-scheduled",
-    "devprod": "wrangler dev --env prod src/index.ts --local --test-scheduled"
+    "deploy": "wrangler deploy --env prod",
+    "dev": "wrangler dev --test-scheduled",
+    "devprod": "wrangler dev --env prod --test-scheduled",
+    "typecheck": "tsc"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240314.0",
-    "wrangler": "^3.34.2"
+    "@cloudflare/workers-types": "^5.20260819.1",
+    "typescript": "^7.0.2",
+    "wrangler": "^4.124.0"
   },
   "dependencies": {
     "cheerio": "^1.1.2",

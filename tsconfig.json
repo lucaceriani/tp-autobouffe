@@ -2,14 +2,13 @@
   "compilerOptions": {
     "noEmit": true,
     "module": "esnext",
-    "target": "es2020",
-    "lib": ["es2020"],
+    "target": "es2022",
+    "lib": ["es2022"],
     "strict": true,
-    "alwaysStrict": true,
     "preserveConstEnums": true,
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "types": ["@cloudflare/workers-types", "@types/jest"]
+    "moduleResolution": "bundler",
+    "skipLibCheck": true,
+    "types": ["@cloudflare/workers-types"]
   },
   "include": ["src", "index.d.ts"],
   "exclude": ["node_modules", "dist", "test"]
