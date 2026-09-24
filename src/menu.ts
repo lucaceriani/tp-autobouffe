@@ -1,30 +1,7 @@
 import { load as CheerioLoad } from 'cheerio'
 import { Env } from './types'
 
-const sample = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)]
-
-const UA = [
-  'Mozilla/5.0',
-  sample([
-    'Windows NT 10.0; Win64; x64',
-    'Macintosh; Intel Mac OS X 10_15_7',
-    'X11; Linux x86_64',
-    'iPhone; CPU iPhone OS 14_0 like Mac OS X',
-    'iPad; CPU OS 14_0 like Mac OS X',
-    'Android 12; Mobile; rv:97.0',
-  ]),
-  'AppleWebKit/537.36 (KHTML, like Gecko)',
-  sample(
-    [
-      // adding some random versions to avoid being blocked by the server
-      'Chrome/105.0.0',
-      'Firefox/106.0',
-      'Edge/130.0.',
-      'SamsungBrowser/16.0',
-    ].map(b => b + '.' + Math.floor(Math.random() * 1000))
-  ),
-  'Safari/537.36',
-].join(' ')
+const UA = 'tp-autobouffe/1.0 (+https://github.com/lucaceriani/tp-autobouffe; tp-autobouffe@luca.gg)'
 
 const ERROR_MSG = "J'arrive pas à récupérer le menu, désolé 🤷 je ferai mieux demain 💤"
 
